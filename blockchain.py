@@ -24,6 +24,7 @@ class Block:
     def calculate_hash(self):
         # hexdigest() returns the hash in hexadecimal format so it is easier to read
         # encode() converts the string to bytes
+        # this function allows us to validate the integrity of the block
         return sha256(f"{self.timestamp}{self.data}{self.previous_hash}{self.nonce}".encode()).hexdigest()
 
 
@@ -33,9 +34,7 @@ class Blockchain:
         self.genesis_block = self.create_genesis_block()
         self.genesis_block_hash = self.genesis_block.calculate_hash()
         self.chain = [self.genesis_block]
-        # self.all_transactions = []
         print(f"Genesis Block has been created with hash: {self.genesis_block_hash}")
-        
         pass
 
     def create_genesis_block(self):
@@ -147,8 +146,28 @@ def test4():
     my_blockchain.print_blocks()
     print(my_blockchain.validate_chain())
 
+def testLastBlock():
+    my_blockchain = Blockchain()
+    my_blockchain.add_block(new_transactions)
+    my_blockchain.add_block(transaction2)
+    my_blockchain.add_block(transaction3)
+    my_blockchain.print_blocks()
+    my_blockchain.chain[2].data = "fake_transactions"
+    # lets hash all the blocks again
+    for i in range(1, len(my_blockchain.chain)):
+        my_blockchain.chain[i].hash = my_blockchain.chain[i].calculate_hash()
+        # print(my_blockchain.chain[i])
+        if i+1 < len(my_blockchain.chain):
+            my_blockchain.chain[i+1].previous_hash = my_blockchain.chain[i].hash
+
+    # as we can see the hash of the last block is different
+    my_blockchain.print_blocks()
+    # print(my_blockchain.chain[-1])
+
+
 # test1()
 # test2()
 # test3()
-test4()
+# test4()
+# testLastBlock()
 
